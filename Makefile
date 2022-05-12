@@ -3,31 +3,36 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: danisanc <danisanc@students.42wolfsburg    +#+  +:+       +#+         #
+#    By: danisanc <danisanc@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
-#    Created: 2022/04/10 14:28:55 by danisanc          #+#    #+#              #
-#    Updated: 2022/05/11 00:24:40 by danisanc         ###   ########.fr        #
+#    Created: 2022/05/09 20:22:30 by danisanc          #+#    #+#              #
+#    Updated: 2022/05/10 17:55:32 by danisanc         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME = pipex
 
-SRCS = start.c
+SRCS = main.c
 
 CC = gcc
 
-CFLAGS = -Wextra -Wall -Werror -g
+##CFLAGS = -Wextra -Wall -Werror
 
-$(NAME): 
-	$(CC) ${SRCS} libft/libft.a  -o $(NAME)
+OBJS	= ${SRCS:.c=.o}
+
+$(NAME): $(OBJS)
+	$(MAKE) -C libft
+	$(CC) $(OBJS) libft/libft.a -o $(NAME)
 
 all: $(NAME)
 
 clean:
-	rm -f $(OBJS)
+	rm -f *.o
+	rm -f libft/*.o
 
 fclean: clean
 	rm -f $(NAME)
+	rm -f libft/libft.a
 
 re: fclean all
 
