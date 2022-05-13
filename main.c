@@ -3,16 +3,17 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: danisanc <danisanc@student.42.fr>          +#+  +:+       +#+        */
+/*   By: danisanc <danisanc@students.42wolfsburg    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/11 21:22:38 by danisanc          #+#    #+#             */
-/*   Updated: 2022/05/12 16:12:15 by danisanc         ###   ########.fr       */
+/*   Updated: 2022/05/14 00:18:35 by danisanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
+#include <stdio.h>
 
-char	*get_correct_path(char **paths, char **argv)
+char	*get_correct_path(char **paths, char **cmd)
 {
 	int	i;
 	char	*a_path;
@@ -21,7 +22,7 @@ char	*get_correct_path(char **paths, char **argv)
 	while (paths[i])
 	{
 		a_path = ft_strjoin(paths[i], "/");
-		a_path = ft_strjoin(a_path, argv[2]);
+		a_path = ft_strjoin(a_path, cmd[0]);
 		if (access(a_path, F_OK) == 0)
 			return (a_path);
 		free(a_path);
@@ -46,28 +47,61 @@ char **get_paths(char **env)
 	return (NULL);
 }
 
+void execute_cmds(char **argv, char **env, int i)
+{
+	char	*a_path;
+	char	**cmd;
+	int		id;
+	int		fd[2];
+
+	if (pipe(fd) == -1)
+		perror("Couldn't create pipe");
+	id = fork();
+	cmd = ft_split(argv[i], ' ');
+	a_path = get_correct_path(get_paths(env), cmd);
+	if (id == 0)
+	{	
+		dup2(fd[1], STDOUT_FILENO);
+		close(fd[0]);
+		execve(a_path, cmd, env);
+	}
+	waitpid(id, NULL, WNOHANG);
+	dup2(fd[0], STDIN_FILENO);
+	
+}
+
+void last_cmd(char **argv, char **env, int i)
+{
+	char	*a_path;
+	char	**cmd;
+
+	cmd = ft_split(argv[2 + i], ' ');
+	a_path = get_correct_path(get_paths(env), cmd);
+	execve(a_path, cmd, env);
+}
+
 int main(int argc, char **argv, char **env)
 {
 	int	fd[2];
-	char *a_path;
-	int	file;
 	int	i;
-	int	id;
-	char	*buf;
 
-	i = 0;
-	file = open(argv[1], O_RDONLY);
-	if (pipe(fd) == -1)
-		return (1);
-	a_path = get_correct_path(get_paths(env), argv);
+	i = 2;
+	fd[0] = open(argv[1], O_RDONLY);
+	fd[1] = open(argv[argc - 1], O_WRONLY | O_CREAT, 0777);
+	// printf("%d\n",fd[0]);
+	// printf("%s\n",cmd[0]);
+	// printf("%s\n",cmd[1]);
+	// if (pipe(fd) == -1)
+	// 	return (1);
+	//a_path = get_correct_path(get_paths(env), cmd);
 	//printf("%s\n", a_path);
-	id = fork();
-	if (id == 0)
+	dup2(fd[0], STDIN_FILENO);
+	while (i <= argc - 3)
 	{
-		read(file, buf, 50); // if -1
-		execve(a_path, buf, env);
-		//write if -1
+		execute_cmds(argv, env, i);
+		i++;
 	}
-	wait(NULL);
-	
+	dup2(fd[1], STDOUT_FILENO);
+	last_cmd(argv, env, argc - 2);
+	//return (0);
 }
