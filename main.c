@@ -6,7 +6,7 @@
 /*   By: danisanc <danisanc@students.42wolfsburg    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/11 21:22:38 by danisanc          #+#    #+#             */
-/*   Updated: 2022/05/14 00:18:35 by danisanc         ###   ########.fr       */
+/*   Updated: 2022/05/14 01:44:44 by danisanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,26 +28,55 @@ char	*get_correct_path(char **paths, char **cmd)
 		free(a_path);
 		i++;
 	}
-	return (NULL);
+	ft_putstr_fd("Command '", 2);
+	ft_putstr_fd(cmd[0], 2);
+	ft_putstr_fd("' not found :( \n", 2);
+	exit (0);
 }
+
+int	ft_strnncmp(const char *s1, const char *s2, size_t n)
+{
+	int												i;
+	unsigned char									*p;
+	unsigned char									*p2;
+
+	p = (unsigned char *)s1;
+	p2 = (unsigned char *)s2;
+	i = 0;
+	while ((p[i] != '\0' || p2[i] != '\0') && n > 0)
+	{
+		if (p[i] != p2[i])
+		{
+			return (p[i] - p2[i]);
+		}
+		else
+		{
+			i++;
+			n--;
+		}
+	}
+	return (0);
+}
+
 
 char **get_paths(char **env)
 {
 	int	i;
 
 	i = 0;
-	while (env[++i])
+	while (env[i])
 	{
-		if (ft_strncmp(env[i], "PATH", 4) == 0)
+		if (ft_strnncmp(env[i], "PATH", 4) == 0)
 		{
 			ft_memmove(env[i], env[i] + 5, ft_strlen(env[i]));
 			return (ft_split(env[i], ':'));
 		}
+		i++;
 	}
 	return (NULL);
 }
 
-void execute_cmds(char **argv, char **env, int i)
+void execute_cmds(char **argv, char **env, int i, char **paths)
 {
 	char	*a_path;
 	char	**cmd;
@@ -58,50 +87,53 @@ void execute_cmds(char **argv, char **env, int i)
 		perror("Couldn't create pipe");
 	id = fork();
 	cmd = ft_split(argv[i], ' ');
-	a_path = get_correct_path(get_paths(env), cmd);
+	a_path = get_correct_path(paths, cmd);
 	if (id == 0)
-	{	
+	{
 		dup2(fd[1], STDOUT_FILENO);
+		close(fd[1]);
 		close(fd[0]);
-		execve(a_path, cmd, env);
+		if (execve(a_path, cmd, env) == 0)
+			perror("cannot execute");
 	}
 	waitpid(id, NULL, WNOHANG);
 	dup2(fd[0], STDIN_FILENO);
-	
+	close(fd[0]);
+	close(fd[1]);
 }
 
-void last_cmd(char **argv, char **env, int i)
+void last_cmd(char **argv, char **env, int i, char **paths)
 {
 	char	*a_path;
 	char	**cmd;
 
-	cmd = ft_split(argv[2 + i], ' ');
-	a_path = get_correct_path(get_paths(env), cmd);
+	cmd = ft_split(argv[i], ' ');
+	a_path = get_correct_path(paths, cmd);
 	execve(a_path, cmd, env);
 }
 
 int main(int argc, char **argv, char **env)
 {
-	int	fd[2];
-	int	i;
+	int		fd[2];
+	char	**paths;
+	char	*a_path;
+	char	**cmd;
+	int		i;
 
 	i = 2;
 	fd[0] = open(argv[1], O_RDONLY);
-	fd[1] = open(argv[argc - 1], O_WRONLY | O_CREAT, 0777);
-	// printf("%d\n",fd[0]);
-	// printf("%s\n",cmd[0]);
-	// printf("%s\n",cmd[1]);
-	// if (pipe(fd) == -1)
-	// 	return (1);
-	//a_path = get_correct_path(get_paths(env), cmd);
-	//printf("%s\n", a_path);
+	fd[1] = open(argv[argc - 1], O_WRONLY | O_CREAT  | O_TRUNC, 0777);
+	paths = get_paths(env);
 	dup2(fd[0], STDIN_FILENO);
-	while (i <= argc - 3)
+	while (i < argc - 2)
 	{
-		execute_cmds(argv, env, i);
+		execute_cmds(argv, env, i, paths);
 		i++;
 	}
 	dup2(fd[1], STDOUT_FILENO);
-	last_cmd(argv, env, argc - 2);
-	//return (0);
+	cmd = ft_split(argv[argc - 2], ' ');
+	a_path = get_correct_path(paths, cmd);
+	if (execve(a_path, cmd, env) == 0)
+			perror("cannot execute");
+	return (0);
 }
