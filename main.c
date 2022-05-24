@@ -6,134 +6,102 @@
 /*   By: danisanc <danisanc@students.42wolfsburg    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/11 21:22:38 by danisanc          #+#    #+#             */
-/*   Updated: 2022/05/14 01:44:44 by danisanc         ###   ########.fr       */
+/*   Updated: 2022/05/24 00:09:17 by danisanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
-#include <stdio.h>
 
-char	*get_correct_path(char **paths, char **cmd)
-{
-	int	i;
-	char	*a_path;
-
-	i = 0;
-	while (paths[i])
-	{
-		a_path = ft_strjoin(paths[i], "/");
-		a_path = ft_strjoin(a_path, cmd[0]);
-		if (access(a_path, F_OK) == 0)
-			return (a_path);
-		free(a_path);
-		i++;
-	}
-	ft_putstr_fd("Command '", 2);
-	ft_putstr_fd(cmd[0], 2);
-	ft_putstr_fd("' not found :( \n", 2);
-	exit (0);
-}
-
-int	ft_strnncmp(const char *s1, const char *s2, size_t n)
-{
-	int												i;
-	unsigned char									*p;
-	unsigned char									*p2;
-
-	p = (unsigned char *)s1;
-	p2 = (unsigned char *)s2;
-	i = 0;
-	while ((p[i] != '\0' || p2[i] != '\0') && n > 0)
-	{
-		if (p[i] != p2[i])
-		{
-			return (p[i] - p2[i]);
-		}
-		else
-		{
-			i++;
-			n--;
-		}
-	}
-	return (0);
-}
-
-
-char **get_paths(char **env)
+void	free_double(char **string)
 {
 	int	i;
 
 	i = 0;
-	while (env[i])
+	while (string[i] != NULL)
 	{
-		if (ft_strnncmp(env[i], "PATH", 4) == 0)
-		{
-			ft_memmove(env[i], env[i] + 5, ft_strlen(env[i]));
-			return (ft_split(env[i], ':'));
-		}
+		free(string[i]);
 		i++;
 	}
-	return (NULL);
+	free(string[i]);
+	free(string);
 }
 
-void execute_cmds(char **argv, char **env, int i, char **paths)
+void	execute_cmds(char **env, char **paths, char *argv)
 {
 	char	*a_path;
 	char	**cmd;
 	int		id;
 	int		fd[2];
 
-	if (pipe(fd) == -1)
-		perror("Couldn't create pipe");
-	id = fork();
-	cmd = ft_split(argv[i], ' ');
-	a_path = get_correct_path(paths, cmd);
+	check_pipe(pipe(fd));
+	check_fork(id = fork());
 	if (id == 0)
 	{
+		cmd = ft_split(argv, ' ');
+		a_path = get_correct_path(paths, cmd);
 		dup2(fd[1], STDOUT_FILENO);
 		close(fd[1]);
-		close(fd[0]);
-		if (execve(a_path, cmd, env) == 0)
-			perror("cannot execute");
+		if (execve(a_path, cmd, env) == -1)
+			exit (EXIT_FAILURE);
 	}
 	waitpid(id, NULL, WNOHANG);
 	dup2(fd[0], STDIN_FILENO);
-	close(fd[0]);
 	close(fd[1]);
 }
 
-void last_cmd(char **argv, char **env, int i, char **paths)
+int	exec_last(int argc, char **argv, char **env, char **paths)
 {
-	char	*a_path;
+	int		id;
 	char	**cmd;
+	char	*a_path;
+	int		status;
 
-	cmd = ft_split(argv[i], ' ');
-	a_path = get_correct_path(paths, cmd);
-	execve(a_path, cmd, env);
+	check_fork(id = fork());
+	if (id == 0)
+	{
+		cmd = ft_split(argv[argc - 2], ' ');
+		a_path = get_correct_path(paths, cmd);
+		execve(a_path, cmd, env);
+		free(a_path);
+		free_double(cmd);
+		exit (EXIT_FAILURE);
+	}
+	waitpid(id, &status, WNOHANG);
+	return (status);
 }
 
-int main(int argc, char **argv, char **env)
+void	set_fds(int fd[2], char **argv, int argc, int *i)
+{
+	if (!ft_strncmp("here_doc", argv[1], 8))
+	{	
+		fd[1] = open(argv[argc - 1], O_WRONLY | O_CREAT | O_APPEND, 0777);
+		here_doc(argv[2]);
+		*i = *i + 1;
+	}
+	else
+	{
+		fd[1] = open(argv[argc - 1], O_WRONLY | O_CREAT | O_TRUNC, 0777);
+		fd[0] = open(argv[1], O_RDONLY);
+		dup2(fd[0], STDIN_FILENO);
+	}
+}
+
+int	main(int argc, char **argv, char **env)
 {
 	int		fd[2];
 	char	**paths;
-	char	*a_path;
-	char	**cmd;
+	int		status;
 	int		i;
 
-	i = 2;
-	fd[0] = open(argv[1], O_RDONLY);
-	fd[1] = open(argv[argc - 1], O_WRONLY | O_CREAT  | O_TRUNC, 0777);
+	i = 1;
+	if (argc < 5)
+		return (1);
+	set_fds(fd, argv, argc, &i);
 	paths = get_paths(env);
-	dup2(fd[0], STDIN_FILENO);
-	while (i < argc - 2)
-	{
-		execute_cmds(argv, env, i, paths);
-		i++;
-	}
+	while (++i < argc - 2)
+		execute_cmds(env, paths, argv[i]);
 	dup2(fd[1], STDOUT_FILENO);
-	cmd = ft_split(argv[argc - 2], ' ');
-	a_path = get_correct_path(paths, cmd);
-	if (execve(a_path, cmd, env) == 0)
-			perror("cannot execute");
-	return (0);
+	status = exec_last(argc, argv, env, paths);
+	free_double(paths);
+	return (status);
 }

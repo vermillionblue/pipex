@@ -6,17 +6,17 @@
 #    By: danisanc <danisanc@students.42wolfsburg    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/05/09 20:22:30 by danisanc          #+#    #+#              #
-#    Updated: 2022/05/13 23:29:54 by danisanc         ###   ########.fr        #
+#    Updated: 2022/05/24 00:08:06 by danisanc         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME = pipex
 
-SRCS = main.c
+SRCS = main.c gnl/get_next_line.c gnl/get_next_line_utils.c ft_sttrjoin.c  errors.c  parse.c bonus.c
 
 CC = gcc
 
-CFLAGS = -Wextra -Wall -Werror -g
+CFLAGS = -Wextra -Wall -Werror
 
 OBJS	= ${SRCS:.c=.o}
 

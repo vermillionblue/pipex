@@ -3,15 +3,13 @@
 /*                                                        :::      ::::::::   */
 /*   ft_strtrim.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: alessa <alessa@student.42.fr>              +#+  +:+       +#+        */
+/*   By: danisanc <danisanc@students.42wolfsburg    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/27 00:18:52 by danisanc          #+#    #+#             */
-/*   Updated: 2022/01/13 11:07:21 by alessa           ###   ########.fr       */
+/*   Updated: 2022/05/16 15:10:08 by danisanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <stdlib.h>
-#include <stdio.h>
 #include "libft.h"
 
 static int	charinset(char const *set, char c)
@@ -54,10 +52,3 @@ char	*ft_strtrim(char const *s1, char const *set)
 	p[i] = '\0';
 	return (p);
 }
-
-// int main(void)
-// {
-// 	char * s = ft_strtrim("   xxxtripouille", " x");
-//    printf("%s\n", s);
-//    free(s);
-// }

@@ -1,37 +1,31 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_strncmp.c                                       :+:      :+:    :+:   */
+/*   errors.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: danisanc <danisanc@students.42wolfsburg    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2021/11/22 22:06:36 by danisanc          #+#    #+#             */
-/*   Updated: 2022/05/14 00:33:32 by danisanc         ###   ########.fr       */
+/*   Created: 2022/05/23 23:22:44 by danisanc          #+#    #+#             */
+/*   Updated: 2022/05/24 00:04:09 by danisanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "libft.h"
+#include "pipex.h"
 
-int	ft_strncmp(const char *s1, const char *s2, size_t n)
+void	check_fork(int id)
 {
-	int												i;
-	unsigned char									*p;
-	unsigned char									*p2;
-
-	p = (unsigned char *)s1;
-	p2 = (unsigned char *)s2;
-	i = 0;
-	while ((p[i] != '\0' || p2[i] != '\0') && n > 0)
+	if (id == -1)
 	{
-		if (p[i] != p2[i])
-		{
-			return (p[i] - p2[i]);
-		}
-		else
-		{
-			i++;
-			n--;
-		}
+		perror("Couldn't fork()");
+		exit (EXIT_FAILURE);
 	}
-	return (0);
+}
+
+void	check_pipe(int fd)
+{
+	if (fd == -1)
+	{
+		perror("Couldn't pipe()");
+		exit (EXIT_FAILURE);
+	}
 }

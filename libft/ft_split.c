@@ -3,15 +3,13 @@
 /*                                                        :::      ::::::::   */
 /*   ft_split.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: alessa <alessa@student.42.fr>              +#+  +:+       +#+        */
+/*   By: danisanc <danisanc@students.42wolfsburg    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/23 20:11:57 by danisanc          #+#    #+#             */
-/*   Updated: 2021/12/17 14:59:17 by alessa           ###   ########.fr       */
+/*   Updated: 2022/05/16 15:12:26 by danisanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <stdlib.h>
-#include <stdio.h>
 #include "libft.h"
 
 static void	alloc_strns(char const *s, char	**arr, char c)
@@ -105,18 +103,6 @@ char	**ft_split(char const *s, char c)
 	arr = (char **)ft_calloc(num_strns + 1, sizeof(char *));
 	alloc_strns(s, arr, c);
 	char_insert(s, arr, c);
+	free((char *)s);
 	return (arr);
 }
-
-// int main(void)
-// {
-//    char **arr = ft_split("lorem ipsum dolor sit amet, 
-//consectetur adipiscing elit. Sed non risus. Suspendisse", ' ');
-// 	int n = 0;
-// 		while (arr[n])
-// 		{
-// 			printf("%s\n", arr[n]);
-// 			n++;
-// 		}
-//    return(0);
-// }

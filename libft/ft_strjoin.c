@@ -3,15 +3,13 @@
 /*                                                        :::      ::::::::   */
 /*   ft_strjoin.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: alessa <alessa@student.42.fr>              +#+  +:+       +#+        */
+/*   By: danisanc <danisanc@students.42wolfsburg    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/23 15:19:33 by danisanc          #+#    #+#             */
-/*   Updated: 2021/12/11 15:11:32 by alessa           ###   ########.fr       */
+/*   Updated: 2022/05/23 14:31:06 by danisanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <stdlib.h>
-#include <stdio.h>
 #include "libft.h"
 
 char	*ft_strjoin(char const *s1, char const *s2)
@@ -41,13 +39,3 @@ char	*ft_strjoin(char const *s1, char const *s2)
 	p[i + k] = '\0';
 	return (p);
 }
-
-// int main(void)
-// {
-// 		char	s1[] = "lorem ipsum";
-// 		s1[0] = '\0';
-// 		char	s2[] = "dolor sit amet";
-// 		char *p = ft_strjoin(s1, s2);
-// 		printf("%s\n", p);
-
-// }

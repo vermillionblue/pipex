@@ -1,37 +1,41 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_strncmp.c                                       :+:      :+:    :+:   */
+/*   ft_sttrjoin.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: danisanc <danisanc@students.42wolfsburg    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2021/11/22 22:06:36 by danisanc          #+#    #+#             */
-/*   Updated: 2022/05/14 00:33:32 by danisanc         ###   ########.fr       */
+/*   Created: 2021/11/23 15:19:33 by danisanc          #+#    #+#             */
+/*   Updated: 2022/05/23 15:36:28 by danisanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "libft.h"
+#include "pipex.h"
 
-int	ft_strncmp(const char *s1, const char *s2, size_t n)
+char	*ft_sttrjoin(char const *s1, char const *s2)
 {
-	int												i;
-	unsigned char									*p;
-	unsigned char									*p2;
+	int		i;
+	int		k;
+	char	*p;
+	int		j;
 
-	p = (unsigned char *)s1;
-	p2 = (unsigned char *)s2;
-	i = 0;
-	while ((p[i] != '\0' || p2[i] != '\0') && n > 0)
+	j = 0;
+	i = ft_strlen((char *)s1);
+	k = ft_strlen((char *)s2);
+	p = malloc(k + i + 1);
+	if (p == NULL)
+		return (NULL);
+	while (j < i)
 	{
-		if (p[i] != p2[i])
-		{
-			return (p[i] - p2[i]);
-		}
-		else
-		{
-			i++;
-			n--;
-		}
+		p[j] = s1[j];
+		j++;
 	}
-	return (0);
+	j = 0;
+	while (j < k)
+	{
+		p[i + j] = s2[j];
+		j++;
+	}
+	p[i + k] = '\0';
+	return (p);
 }
