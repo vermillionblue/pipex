@@ -6,7 +6,7 @@
 /*   By: danisanc <danisanc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/23 23:55:51 by danisanc          #+#    #+#             */
-/*   Updated: 2022/05/25 18:38:42 by danisanc         ###   ########.fr       */
+/*   Updated: 2022/05/25 21:08:41 by danisanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,28 +40,33 @@ char	*ft_join(char const *s1, char const *s2)
 	return (p);
 }
 
-char	*read_stdin(char *limiter)
+char	*read_stdin(char *limiter, char *file)
 {
 	char	*line;
 	int		fd;
+	int		id;
 
-	fd = open(".here_doc", O_WRONLY | O_CREAT | O_TRUNC, 0777);
-	limiter = ft_join(limiter, "\n");
-	while (1)
+	check_fork(id = fork());
+	fd = open(file, O_WRONLY | O_CREAT | O_TRUNC, 0777);
+	if (id == 0)
 	{
-		write(1, "> ", 2);
-		line = get_next_line(STDIN_FILENO);
-		if (!ft_strncmp(limiter, line, ft_strlen(limiter) + 1) || !line)
-			break ;
-		write(fd, line, ft_strlen(line));
-		free(line);
+		limiter = ft_join(limiter, "\n");
+		while (1)
+		{
+			write(1, "> ", 2);
+			line = get_next_line(STDIN_FILENO);
+			if (!ft_strncmp(limiter, line, ft_strlen(limiter) + 1) || !line)
+				exit (EXIT_SUCCESS);
+			write(fd, line, ft_strlen(line));
+			free(line);
+		}
 	}
-	free(limiter);
-	return (".here_doc");
+	wait(NULL);
+	return (file);
 }
 
-void	clean_here_doc(char *start)
+void	clean_here_doc(char *start, char *file)
 {
 	if (!ft_strncmp("here_doc", start, 8))
-		unlink(".here_doc");
+		unlink(file);
 }

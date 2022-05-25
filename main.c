@@ -6,7 +6,7 @@
 /*   By: danisanc <danisanc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/11 21:22:38 by danisanc          #+#    #+#             */
-/*   Updated: 2022/05/25 18:39:27 by danisanc         ###   ########.fr       */
+/*   Updated: 2022/05/25 21:03:11 by danisanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,20 +70,25 @@ int	exec_last(int argc, char **argv, char **env, char **paths)
 	return (status);
 }
 
-void	set_fds(int fd[2], char **argv, int argc, int *i)
+int	set_fds(int fd[2], char **argv, int argc, char *file)
 {
+	int	i;
+
 	if (!ft_strncmp("here_doc", argv[1], 8))
 	{	
 		fd[1] = open(argv[argc - 1], O_WRONLY | O_CREAT | O_APPEND, 0777);
-		fd[0] = open(read_stdin(argv[2]), O_RDONLY);
-		*i = *i + 1;
+		file = read_stdin(argv[2], file);
+		fd[0] = open(file, O_RDONLY);
+		i = 2;
 	}
 	else
 	{
 		fd[1] = open(argv[argc - 1], O_WRONLY | O_CREAT | O_TRUNC, 0777);
 		fd[0] = open(argv[1], O_RDONLY);
+		i = 1;
 	}
 	dup2(fd[0], STDIN_FILENO);
+	return (i);
 }
 
 int	main(int argc, char **argv, char **env)
@@ -92,17 +97,18 @@ int	main(int argc, char **argv, char **env)
 	char	**paths;
 	int		status;
 	int		i;
+	char	*tempfile;
 
-	i = 1;
+	tempfile = ".here_doc";
 	if (argc < 5)
 		return (1);
-	set_fds(fd, argv, argc, &i);
+	i = set_fds(fd, argv, argc, tempfile);
 	paths = get_paths(env);
 	while (++i < argc - 2)
 		execute_cmds(env, paths, argv[i]);
 	dup2(fd[1], STDOUT_FILENO);
 	status = exec_last(argc, argv, env, paths);
 	free_double(paths);
-	clean_here_doc(argv[1]);
+	clean_here_doc(argv[1], tempfile);
 	return (status);
 }
