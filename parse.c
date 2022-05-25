@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parse.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: danisanc <danisanc@students.42wolfsburg    +#+  +:+       +#+        */
+/*   By: danisanc <danisanc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/23 23:52:31 by danisanc          #+#    #+#             */
-/*   Updated: 2022/05/24 00:05:39 by danisanc         ###   ########.fr       */
+/*   Updated: 2022/05/25 18:28:57 by danisanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,8 @@ char	*get_correct_path(char **paths, char **cmd)
 			return (a_path);
 		i++;
 	}
-	ft_putstr_fd("command not found ", 2);
+	ft_putstr_fd(cmd[0], 2);
+	ft_putstr_fd(" : command not found\n ", 2);
 	exit (EXIT_FAILURE);
 }
 

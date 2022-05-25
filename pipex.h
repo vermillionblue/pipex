@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   pipex.h                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: danisanc <danisanc@students.42wolfsburg    +#+  +:+       +#+        */
+/*   By: danisanc <danisanc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/09 20:13:45 by danisanc          #+#    #+#             */
-/*   Updated: 2022/05/24 00:05:56 by danisanc         ###   ########.fr       */
+/*   Updated: 2022/05/25 18:17:19 by danisanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,5 +27,6 @@ void	check_pipe(int fd);
 char	**get_paths(char **env);
 char	*get_correct_path(char **paths, char **cmd);
 //bonus
-void	here_doc(char *limiter);
+char	*read_stdin(char *limiter);
+void	clean_here_doc(char *start);
 #endif

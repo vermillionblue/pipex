@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: danisanc <danisanc@students.42wolfsburg    +#+  +:+       +#+        */
+/*   By: danisanc <danisanc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/11 21:22:38 by danisanc          #+#    #+#             */
-/*   Updated: 2022/05/24 00:09:17 by danisanc         ###   ########.fr       */
+/*   Updated: 2022/05/25 18:39:27 by danisanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,15 +75,15 @@ void	set_fds(int fd[2], char **argv, int argc, int *i)
 	if (!ft_strncmp("here_doc", argv[1], 8))
 	{	
 		fd[1] = open(argv[argc - 1], O_WRONLY | O_CREAT | O_APPEND, 0777);
-		here_doc(argv[2]);
+		fd[0] = open(read_stdin(argv[2]), O_RDONLY);
 		*i = *i + 1;
 	}
 	else
 	{
 		fd[1] = open(argv[argc - 1], O_WRONLY | O_CREAT | O_TRUNC, 0777);
 		fd[0] = open(argv[1], O_RDONLY);
-		dup2(fd[0], STDIN_FILENO);
 	}
+	dup2(fd[0], STDIN_FILENO);
 }
 
 int	main(int argc, char **argv, char **env)
@@ -103,5 +103,6 @@ int	main(int argc, char **argv, char **env)
 	dup2(fd[1], STDOUT_FILENO);
 	status = exec_last(argc, argv, env, paths);
 	free_double(paths);
+	clean_here_doc(argv[1]);
 	return (status);
 }

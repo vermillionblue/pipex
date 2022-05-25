@@ -3,16 +3,17 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: danisanc <danisanc@students.42wolfsburg    +#+  +:+       +#+         #
+#    By: danisanc <danisanc@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/05/09 20:22:30 by danisanc          #+#    #+#              #
-#    Updated: 2022/05/24 00:08:06 by danisanc         ###   ########.fr        #
+#    Updated: 2022/05/25 18:29:35 by danisanc         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME = pipex
 
-SRCS = main.c gnl/get_next_line.c gnl/get_next_line_utils.c ft_sttrjoin.c  errors.c  parse.c bonus.c
+SRCS = main.c gnl/get_next_line.c gnl/get_next_line_utils.c \
+errors.c  parse.c bonus.c
 
 CC = gcc
 
@@ -29,6 +30,7 @@ all: $(NAME)
 clean:
 	rm -f *.o
 	rm -f libft/*.o
+	rm -f gnl/*.o
 
 fclean: clean
 	rm -f $(NAME)
